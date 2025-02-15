@@ -140,10 +140,12 @@
 
         // Fetch the invoice image URL from Google Apps Script
         async function fetchInvoiceImageUrl() {
-            const response = await fetch("https://script.google.com/macros/s/AKfycbxbyjvtN4sIWJGitO9eli0zc3UeoDx2mVrjEpEhwgN2KDUNgLd1H-jxG5Xoml4jkdYo/exec?action=getInvoiceImageUrl");
-            const data = await response.json();
-            return data.invoiceImageUrl;
-        }
+    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    const targetUrl = "https://script.google.com/macros/s/AKfycbxbyjvtN4sIWJGitO9eli0zc3UeoDx2mVrjEpEhwgN2KDUNgLd1H-jxG5Xoml4jkdYo/exec?action=getInvoiceImageUrl";
+    const response = await fetch(proxyUrl + targetUrl);
+    const data = await response.json();
+    return data.invoiceImageUrl;
+}
 
         // Set the invoice image as the background of the canvas
         async function setInvoiceBackground() {
