@@ -138,14 +138,19 @@
         const canvas = document.getElementById('signature-pad');
         const signaturePad = new SignaturePad(canvas);
 
-        // Fetch the invoice image URL from Google Apps Script
+        // Fetch the invoice image URL using a CORS proxy
         async function fetchInvoiceImageUrl() {
-    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-    const targetUrl = "https://script.google.com/macros/s/AKfycbxbyjvtN4sIWJGitO9eli0zc3UeoDx2mVrjEpEhwgN2KDUNgLd1H-jxG5Xoml4jkdYo/exec?action=getInvoiceImageUrl";
-    const response = await fetch(proxyUrl + targetUrl);
-    const data = await response.json();
-    return data.invoiceImageUrl;
-}
+            const proxyUrl = "https://cors-anywhere.herokuapp.com/"; // CORS proxy
+            const targetUrl = "https://script.google.com/macros/s/AKfycbz2xwzoiVzrElE0VJpbqHqKRAHYuoJzD9tWd4L7tToVl0YiQ4shhbnnAyE9M19UWkXB/exec?action=getInvoiceImageUrl";
+            try {
+                const response = await fetch(proxyUrl + targetUrl);
+                const data = await response.json();
+                return data.invoiceImageUrl;
+            } catch (error) {
+                console.error("Error fetching invoice image URL:", error);
+                return null;
+            }
+        }
 
         // Set the invoice image as the background of the canvas
         async function setInvoiceBackground() {
@@ -176,10 +181,11 @@
 
             const dataURL = signaturePad.toDataURL();
 
-            // Send the signature to Google Sheets
-            fetch("https://script.google.com/macros/s/AKfycbxbyjvtN4sIWJGitO9eli0zc3UeoDx2mVrjEpEhwgN2KDUNgLd1H-jxG5Xoml4jkdYo/exec", {
+            // Use a CORS proxy to send the signature to Google Sheets
+            const proxyUrl = "https://cors-anywhere.herokuapp.com/"; // CORS proxy
+            const targetUrl = "https://script.google.com/macros/s/AKfycbz2xwzoiVzrElE0VJpbqHqKRAHYuoJzD9tWd4L7tToVl0YiQ4shhbnnAyE9M19UWkXB/exec";
+            fetch(proxyUrl + targetUrl, {
                 method: "POST",
-                mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ image: dataURL })
             }).then(response => {
