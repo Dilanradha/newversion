@@ -140,7 +140,7 @@
 
         // Fetch the invoice image URL from Google Apps Script
         async function fetchInvoiceImageUrl() {
-            const response = await fetch("https://script.google.com/macros/s/AKfycbzglckviemX2TkaGXd1al7CbEatWSzxaXMiO2wvPxOIgpQ6azmeelOiPTPrVnqj7eRm/exec?action=getInvoiceImageUrl");
+            const response = await fetch("https://script.google.com/macros/s/AKfycbw6JUIR6CiBeHklK4KV86VDDbmm3XYteOpZMm7MjquKTkF1F533TLE4CXdwd6I23q4/exec?action=getInvoiceImageUrl");
             const data = await response.json();
             return data.invoiceImageUrl;
         }
@@ -175,7 +175,7 @@
             const dataURL = signaturePad.toDataURL();
 
             // Send the signature to Google Sheets
-            fetch("https://script.google.com/macros/s/AKfycbzglckviemX2TkaGXd1al7CbEatWSzxaXMiO2wvPxOIgpQ6azmeelOiPTPrVnqj7eRm/exec", {
+            fetch("https://script.google.com/macros/s/AKfycbw6JUIR6CiBeHklK4KV86VDDbmm3XYteOpZMm7MjquKTkF1F533TLE4CXdwd6I23q4/exec", {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
