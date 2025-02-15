@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Invoice Signing</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; font-family: 'Arial', sans-serif; background-color: #f0f4f8; }
+        body { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; text-align: center; }
+        h2 { font-size: 2.5rem; margin-bottom: 20px; font-weight: 700; }
+        #signature-pad-container { display: flex; flex-direction: column; align-items: center; background-color: rgba(255, 255, 255, 0.9); border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); padding: 20px; width: 90%; max-width: 600px; height: auto; backdrop-filter: blur(5px); }
+        img { width: 100%; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); margin-bottom: 10px; }
+        canvas { border: 2px solid #fff; width: 100%; height: 200px; background-color: #fff; border-radius: 8px; }
+        .button-container { display: flex; justify-content: space-between; width: 100%; margin-top: 10px; }
+        button { width: 48%; padding: 10px; font-size: 18px; border: none; border-radius: 10px; background-color: #ff7f50; color: white; transition: background-color 0.3s ease, transform 0.3s ease; }
+        button:hover { background-color: #ff6347; transform: translateY(-2px); }
+        button:active { background-color: #ff4500; transform: translateY(2px); }
+    </style>
+</head>
+<body>
+
+    <div id="signature-pad-container">
+        <h2>Sign Invoice</h2>
+        <img id="invoice-image" src="" alt="Invoice will appear here">
+        <canvas id="signature-pad"></canvas>
+        <div class="button-container">
+            <button onclick="saveSignature()">Save</button>
+            <button onclick="clearSignature()">Clear</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+    <script>
+        const canvas = document.getElementById('signature-pad');
+        const signaturePad = new SignaturePad(canvas);
+        const invoiceImage = document.getElementById('invoice-image');
+
+        function loadInvoiceImage() {
+            fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        invoiceImage.src = data.invoiceUrl;
+                    } else {
+                        alert("No invoices available.");
+                    }
+                })
+                .catch(error => console.error("Error fetching invoice:", error));
+        }
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear();
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+        loadInvoiceImage();
+
+        function saveSignature() {
+            if (signaturePad.isEmpty()) {
+                alert("Please provide a signature.");
+                return;
+            }
+
+            const dataURL = signaturePad.toDataURL();
+            fetch("https://script.google.com/macros/s/1VfC6bU2hoasMSXb2l-9bxWKjGpdQJAwS5402vqhsPY4/exec", {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ image: dataURL })
+            }).then(response => {
+                alert("Signature saved!");
+                signaturePad.clear();
+            }).catch(error => {
+                console.error("Error:", error);
+                alert("Failed to save signature.");
+            });
+        }
+
+        function clearSignature() {
+            signaturePad.clear();
+        }
+    </script>
+
+</body>
+</html>
